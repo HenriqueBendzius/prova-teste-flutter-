@@ -1,0 +1,90 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Exemplo de Navegação',
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _dadosRecebidos = '';
+
+  void _navegarParaSegundaTela(BuildContext context) async {
+    // Navega para a Segunda Tela e aguarda o resultado
+    final resultado = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SecondScreen(dados: 'Olá da Tela Inicial'),
+      ),
+    );
+
+    // Atualiza o estado com os dados recebidos
+    if (resultado != null) {
+      setState(() {
+        _dadosRecebidos = resultado;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Tela Inicial')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Dados Recebidos: $_dadosRecebidos'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _navegarParaSegundaTela(context),
+              child: Text('Ir para a Segunda Tela'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  final String dados;
+
+  SecondScreen({Key key, @required this.dados}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Segunda Tela')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(dados), // Exibe os dados recebidos
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Retorna dados de volta para a tela inicial
+                Navigator.pop(context, 'Dados da Segunda Tela');
+              },
+              child: Text('Retornar Dados'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
