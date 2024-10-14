@@ -1,0 +1,128 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Exemplo de Navegação',
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _idadeController = TextEditingController();
+  String _dadosRecebidos = '';
+
+  void _navegarParaSegundaTela(BuildContext context) async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final aluno = {
+        'nome': _nomeController.text,
+        'idade': _idadeController.text,
+      };
+
+      final resultado = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SecondScreen(aluno: aluno),
+        ),
+      );
+
+      if (resultado != null) {
+        setState(() {
+          _dadosRecebidos = resultado;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Tela Inicial')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Dados Recebidos: $_dadosRecebidos'),
+            SizedBox(height: 20),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nomeController,
+                    decoration: InputDecoration(labelText: 'Nome'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira o nome.';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _idadeController,
+                    decoration: InputDecoration(labelText: 'Idade'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira a idade.';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => _navegarParaSegundaTela(context),
+                    child: Text('Enviar Dados'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatelessWidget {
+  final Map<String, String> aluno;
+
+  SecondScreen({Key? key, required this.aluno}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Segunda Tela')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Nome: ${aluno['nome']}'),
+            Text('Idade: ${aluno['idade']}'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, 'Dados de ${aluno['nome']} retornados');
+              },
+              child: Text('Retornar Dados'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
